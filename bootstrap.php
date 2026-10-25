@@ -366,6 +366,11 @@ function finish_myaac_install(PDO $pdo): void
 	$settings->updateInDatabase('core', 'anonymous_usage_statistics', 'false');
 	$settings->updateInDatabase('core', 'date_timezone', env_value('MYAAC_TIMEZONE', 'America/Fortaleza'));
 	$settings->updateInDatabase('core', 'client', env_value('MYAAC_CLIENT_VERSION', '1513'));
+	// MyAAC upstream defaults core.status_ip to '127.0.0.1' (settings.php) and
+	// a non-empty status_ip overrides the engine config's ip in status.php,
+	// leaving the status widget polling this pod's localhost. Clear it so the
+	// server's own config.lua ip is used.
+	$settings->updateInDatabase('core', 'status_ip', '');
 
 	$statement = $pdo->prepare(
 		'INSERT INTO myaac_config (`name`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)'
